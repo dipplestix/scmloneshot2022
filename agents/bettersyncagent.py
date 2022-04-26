@@ -3,8 +3,6 @@ class TestAgent(OneShotAgent):
         # Initializes the agent.
         # Gets the probability of different exogenous contracts quantities given the world size
         # Does some administrative stuff based on the level of the agent
-        quant_prob = np.load('quants.npy', allow_pickle=True).item()
-        diff_prob = np.load('diffs.npy', allow_pickle=True).item()
         self.world_size = f'{len(self.awi.all_consumers[0])} {len(self.awi.all_consumers[1])}'
         self.max_wait = len(self.awi.all_consumers[0]) + len(self.awi.all_consumers[1]) + 1
         try:
