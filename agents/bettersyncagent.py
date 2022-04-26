@@ -5,13 +5,6 @@ class TestAgent(OneShotAgent):
         # Does some administrative stuff based on the level of the agent
         self.world_size = f'{len(self.awi.all_consumers[0])} {len(self.awi.all_consumers[1])}'
         self.max_wait = len(self.awi.all_consumers[0]) + len(self.awi.all_consumers[1]) + 1
-        try:
-            self.quant_prob = quant_prob[self.world_size]
-            self.diff_prob = diff_prob[self.world_size]
-        except KeyError:
-            self.quant_prob = None
-            self.diff_prob = None
-
         if self.awi.level == 0:
             self.partners = self.awi.my_consumers
             self.output = [True]
