@@ -1,6 +1,9 @@
 from scml.oneshot import *
 from negmas import ResponseType
 from scml.scml2020.common import QUANTITY, TIME, UNIT_PRICE
+import numpy as np
+import random
+from math import floor
 
 class BetterSyncAgent(OneShotAgent):
     def init(self):

@@ -19,18 +19,28 @@ class StrategyGoldfishParetoAspiration(Strategy):
 
     def calculate_pareto_frontier(self, my_ufun, opp_ufun):
         frontier = []
-        for offer1 in my_ufun.offer_set:
-            my_util1 = my_ufun(offer1)
-            opp_util1 = opp_ufun(offer1)
+        my_us = {o: my_ufun(o) for o in my_ufun.offer_set}
+        opp_us = {o: opp_ufun(o) for o in my_ufun.offer_set}
+        for o1 in my_us:
             is_pareto = True
-            for offer2 in my_ufun.offer_set:
-                my_util2 = my_ufun(offer2)
-                opp_util2 = opp_ufun(offer2) 
-                if (my_util2 > my_util1 and opp_util2 >= opp_util1) or (my_util2 >= my_util1 and opp_util2 > opp_util1):
+            for o2 in my_us:
+                if (my_us[o2] > my_us[o1] and opp_us[o2] >= opp_us[o1]) or (my_us[o2] >= my_us[o1] and opp_us[o2] > opp_us[o1]):
                     is_pareto = False
                     break
             if is_pareto:
-                frontier.append(offer1)
+                frontier.append(o1)
+#         for offer1 in my_ufun.offer_set:
+#             my_util1 = my_ufun(offer1)
+#             opp_util1 = opp_ufun(offer1)
+#             is_pareto = True
+#             for offer2 in my_ufun.offer_set:
+#                 my_util2 = my_ufun(offer2)
+#                 opp_util2 = opp_ufun(offer2) 
+#                 if (my_util2 > my_util1 and opp_util2 >= opp_util1) or (my_util2 >= my_util1 and opp_util2 > opp_util1):
+#                     is_pareto = False
+#                     break
+#             if is_pareto:
+#                 frontier.append(offer1)
         
         return frontier
 
