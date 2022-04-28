@@ -14,6 +14,7 @@ from scml.oneshot import *
 from scml.scml2020.utils import anac2022_oneshot
 from tier1_agent import LearningAgent
 from agents.strategicagent import GPAAgent # TODO: change the import agent name to your agent class name
+from agents.bettersyncagent import TestAgent
 
 warnings.simplefilter("ignore")
 
@@ -33,7 +34,7 @@ def shorten_names(results):
 
 def main():
     # TODO: Modify this list to include/delete your agents! (Make sure to change MyAgent to your agent class name)
-    tournament_types = [RandomOneShotAgent, LearningAgent, GreedyOneShotAgent, GPAAgent]
+    tournament_types = [LearningAgent, GreedyOneShotAgent, GPAAgent]
 
     # TODO: Modify the parameters to see how your agent performs in different settings
     results = anac2022_oneshot(

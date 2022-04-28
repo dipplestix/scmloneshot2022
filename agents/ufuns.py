@@ -10,11 +10,11 @@ class BilateralUtilityFunction():
         max_price = self.awi.current_output_issues[UNIT_PRICE].max_value
         for q in range(11):
             for p in range(min_price, max_price+1):
-                self.offer_set.append((q, 0, p))
+                self.offer_set.append((q, awi.current_step, p))
         self.scmlufun = scmlufun
         self.offers = other_offers
 
-        self.best_offer = (0, 0, 0)
+        self.best_offer = (0, awi.current_step, 0)
         best_offer_util = float('-inf')
         for o in self.offer_set:
             o_util = self.__call__(o)

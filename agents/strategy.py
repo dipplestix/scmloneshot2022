@@ -54,12 +54,12 @@ class StrategyGoldfishParetoAspiration(Strategy):
                 current_best = offer
                 max_value = nash_value
 
-        return current_best if not None else (0, 0, 0)
+        return current_best if not None else (0, my_ufun.awi.current_step, 0)
 
     def get_target_utility(self, my_ufun, opp_ufun, frontier, t):
         curr_asp_level = 1.0 - math.pow(t, self.ASP_VAL)
         nash_point = self.calculate_nash_point(my_ufun, opp_ufun, frontier)
-        zero_util = my_ufun((0, 0, 0))
+        zero_util = my_ufun((0, my_ufun.awi.current_step, 0))
         start_util = my_ufun(my_ufun.best_offer)
         end_util = my_ufun(nash_point) * self.NASH_BALANCE + zero_util * (1-self.NASH_BALANCE)
         target_util = curr_asp_level * start_util + (1-curr_asp_level) * end_util

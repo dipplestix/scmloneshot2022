@@ -75,7 +75,7 @@ class BetterSyncAgent(OneShotAgent):
         if response == ResponseType.REJECT_OFFER:
             self.sent_offers[negotiator_id] = self.get_offer(negotiator_id, state, offer)
         else:
-            self.sent_offers[negotiator_id] = [0, 0, 0]
+            self.sent_offers[negotiator_id] = [0, self.awi.current_step, 0]
         return response
 
     def on_negotiation_success(self, contract, mechanism):
@@ -91,8 +91,8 @@ class BetterSyncAgent(OneShotAgent):
         self.accepted_offers[negotiator_id] = offer
 
     def on_negotiation_failure(self, partners, annotation, mechanism, state):
-        return NotImplementedError
-
+        pass
+    
     def get_first_offer(self, negotiator_id, state):
         self.proposal_count[negotiator_id] += 1
 
@@ -218,6 +218,7 @@ class TestAgent(BetterSyncAgent):
 
 
     def on_negotiation_success(self, contract, mechanism):
+        print("success")
         negotiator_id = contract.annotation[self.partner]
         target = self.target_q[negotiator_id]
         q = contract.agreement['quantity']
@@ -254,6 +255,8 @@ class TestAgent(BetterSyncAgent):
 
 
     def on_negotiation_failure(self, partners, annotation, mechanism, state):
+        print("failure :(")
+        print(state.step)
         negotiator_id = annotation[self.partner]
         target = self.target_q[negotiator_id]
 
@@ -273,7 +276,9 @@ class TestAgent(BetterSyncAgent):
         offer[QUANTITY] = self.target_q[negotiator_id]
         offer[TIME] = self.awi.current_step
         self.proposal_count[negotiator_id] += 1
-        return tuple(offer)
+        toffer = tuple(offer)
+        print(toffer)
+        return toffer
 
     def cleanup(self, negotiator_id, offer):
         try:
