@@ -12,9 +12,45 @@ class Strategy():
     def respond():
         return NotImplementedError
 
-class StrategyGoldfishParetoAspiration(Strategy):
+class StrategyAspiration(Strategy):
     def __init__(self) -> None:
         self.ASP_VAL = 1
+
+    def get_target_utility(self, my_ufun, t):
+        curr_asp_level = 1.0 - math.pow(t, self.ASP_VAL)
+        zero_util = my_ufun((0, my_ufun.awi.current_step, 0))
+        start_util = my_ufun(my_ufun.best_offer)
+        target_util = curr_asp_level * start_util + (1-curr_asp_level) * zero_util
+        return target_util
+
+    def propose(self, my_ufun, opp_ufun, t):
+        target = self.get_target_utility(my_ufun, t)
+
+        best_target_offer = None
+        best_distance = float('inf')
+        for offer in my_ufun.offer_set:
+            if my_ufun(offer) >= target and my_ufun(offer) - target < best_distance:
+                best_distance = my_ufun(offer) - target
+                best_target_offer = offer
+
+        if my_ufun.best_offer[0] != 0:
+            return best_target_offer if not None else my_ufun.best_offer
+        else:
+            return (0, my_ufun.awi.current_step, 0)
+
+    def respond(self, my_ufun, opp_offer, t):
+        current_util_level = 1.0 - math.pow(t, self.ASP_VAL)
+        if my_ufun.best_offer[0] == 0:
+            return ResponseType.REJECT_OFFER
+        elif my_ufun(opp_offer) > current_util_level:
+            return ResponseType.ACCEPT_OFFER
+        else:
+            return ResponseType.REJECT_OFFER
+
+
+class StrategyGoldfishParetoAspiration(Strategy):
+    def __init__(self) -> None:
+        self.ASP_VAL = 0.5
         self.NASH_BALANCE = 0.5
 
     def calculate_pareto_frontier(self, my_ufun, opp_ufun):
@@ -76,11 +112,16 @@ class StrategyGoldfishParetoAspiration(Strategy):
                 best_distance = my_ufun(offer) - target
                 best_target_offer = offer
 
-        return best_target_offer if not None else my_ufun.best_offer
+        if my_ufun.best_offer[0] != 0:
+            return best_target_offer if not None else my_ufun.best_offer
+        else:
+            return (0, my_ufun.awi.current_step, 0)
 
     def respond(self, my_ufun, opp_offer, t):
         current_util_level = 1.0 - math.pow(t, self.ASP_VAL)
-        if my_ufun(opp_offer) > current_util_level:
+        if my_ufun.best_offer[0] == 0:
+            return ResponseType.REJECT_OFFER
+        elif my_ufun(opp_offer) > current_util_level:
             return ResponseType.ACCEPT_OFFER
         else:
             return ResponseType.REJECT_OFFER
