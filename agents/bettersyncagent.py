@@ -24,7 +24,7 @@ class BetterSyncAgent(OneShotAgent):
 
         self.balances = {c: [] for c in self.partners}
         self.n_negotiation_rounds = self.awi.settings["neg_n_steps"]
-        self.debug = True
+        self.debug = False
 
     def before_step(self):
         # Sets the agent up for the round.
@@ -105,7 +105,6 @@ class BetterSyncAgent(OneShotAgent):
         accepted.extend(offers)
         new_util = self.ufun.from_offers(tuple(accepted), tuple(self.output*len(accepted)))
         return new_util - dis_util
-
 
     def on_negotiation_failure(self, partners, annotation, mechanism, state):
         pass
@@ -235,12 +234,10 @@ class TestAgent(BetterSyncAgent):
 
 
     def on_negotiation_success(self, contract, mechanism):
-        print("success")
         negotiator_id = contract.annotation[self.partner]
         target = self.target_q[negotiator_id]
         q = contract.agreement['quantity']
         p = contract.agreement['unit_price']
-
         offer = [-1]*3
         offer[TIME] = self.awi.current_step
         offer[QUANTITY] = q
