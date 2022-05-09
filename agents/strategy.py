@@ -50,8 +50,8 @@ class StrategyAspiration(Strategy):
 
 class StrategyGoldfishParetoAspiration(Strategy):
     def __init__(self) -> None:
-        self.ASP_VAL = 0.5
-        self.NASH_BALANCE = 0.5
+        self.ASP_VAL = 1
+        self.NASH_BALANCE = 0.75
 
     def calculate_pareto_frontier(self, my_ufun, opp_ufun):
         frontier = []
@@ -117,8 +117,9 @@ class StrategyGoldfishParetoAspiration(Strategy):
         else:
             return (0, my_ufun.awi.current_step, 0)
 
-    def respond(self, my_ufun, opp_offer, t):
-        current_util_level = 1.0 - math.pow(t, self.ASP_VAL)
+    def respond(self, my_ufun, opp_ufun, opp_offer, t):
+        frontier = self.calculate_pareto_frontier(my_ufun, opp_ufun)
+        current_util_level = self.get_target_utility(my_ufun, opp_ufun, frontier, t)
         if my_ufun.best_offer[0] == 0:
             return ResponseType.REJECT_OFFER
         elif my_ufun(opp_offer) > current_util_level:

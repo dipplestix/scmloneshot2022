@@ -34,12 +34,12 @@ def shorten_names(results):
 
 def main():
     # TODO: Modify this list to include/delete your agents! (Make sure to change MyAgent to your agent class name)
-    tournament_types = [LearningAgent, GreedyOneShotAgent, AspirationMODAgent]
+    tournament_types = [LearningAgent, GreedyOneShotAgent, GPAMeanModelAgent]
 
     # TODO: Modify the parameters to see how your agent performs in different settings
     results = anac2022_oneshot(
         competitors=tournament_types,
-        n_configs=1, # number of different configurations to generate
+        n_configs=10, # number of different configurations to generate
         n_runs_per_world=1, # number of times to repeat every simulation (with agent assignment)
         n_steps = 10, # number of days (simulation steps) per simulation
         print_exceptions=True,

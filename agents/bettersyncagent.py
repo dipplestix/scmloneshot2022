@@ -50,7 +50,7 @@ class BetterSyncAgent(OneShotAgent):
         # Resets the number of proposals/offers/waits to 0
         # Finds information about the exogenous contracts for the round
         # print("\n")
-        print("new day")
+        # print("new day")
         if (self.awi.current_step - 1) % 5 == 0:
             for c in self.partners:
                 self.balances[c].append(self.awi.reports_at_step(self.awi.current_step - 1)[c].cash)
@@ -72,16 +72,16 @@ class BetterSyncAgent(OneShotAgent):
             self.q = self.awi.state().exogenous_input_quantity
             self.min_price = self.awi.current_output_issues[UNIT_PRICE].min_value
             self.max_price = self.awi.current_output_issues[UNIT_PRICE].max_value
-            print("seller")
+            # print("seller")
 
         elif self.awi.level == 1:
             self.q = self.awi.state().exogenous_output_quantity
             self.min_price = self.awi.current_input_issues[UNIT_PRICE].min_value
             self.max_price = self.awi.current_input_issues[UNIT_PRICE].max_value
-            print("buyer")
+            # print("buyer")
 
-        print(f"price range: {self.min_price},{self.max_price}")
-        print(f"exog: {self.q}")
+        # print(f"price range: {self.min_price},{self.max_price}")
+        # print(f"exog: {self.q}")
 
         if self.data_collection:
             self.preliminary_data = {c: [] for c in self.partners}
@@ -101,8 +101,8 @@ class BetterSyncAgent(OneShotAgent):
                 except:
                     pass
         #print(f"My proposal to {negotiator_id}: {offer}")
-        if offer[0] >= self.remaining_exog + 2:
-            print(f"making very large offer {offer[0], self.remaining_exog}")
+        # if offer[0] >= self.remaining_exog + 2:
+        #     print(f"making very large offer {offer[0], self.remaining_exog}")
         return offer
 
     def respond(self, negotiator_id, state, offer):
@@ -116,12 +116,11 @@ class BetterSyncAgent(OneShotAgent):
             self.sent_offers[negotiator_id] = self.get_offer(negotiator_id, state, offer)
         else:
             self.sent_offers[negotiator_id] = [0, self.awi.current_step, 0]
-        if offer[0] >= self.remaining_exog + 2 and response == ResponseType.ACCEPT_OFFER:
-            print("want to accept very large offer")
+        # if offer[0] >= self.remaining_exog + 2 and response == ResponseType.ACCEPT_OFFER:
+        #     print("want to accept very large offer")
         return response
 
     def on_negotiation_success(self, contract, mechanism):
-        print(f"success: {contract} at time {mechanism.state.step}")
         negotiator_id = contract.annotation[self.partner]
         q = contract.agreement['quantity']
         p = contract.agreement['unit_price']

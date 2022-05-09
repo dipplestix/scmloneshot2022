@@ -25,11 +25,19 @@ class StrategicAgent(BetterSyncAgent):
         self.proposal_count[negotiator_id] += 1
         return self.strategy.propose(my_ufun, opp_ufun, t)
 
+    def propose(self, negotiator_id: str, state):
+        o = super().propose(negotiator_id, state)
+        uf = self.calculate_ufun(negotiator_id)
+        # if o != None:
+        #     print(f"My proposal to {negotiator_id}: {o}; marginal utility: {uf(o)}; zero utility: {uf((0, self.awi.current_step, 0))}")
+        return o
+
     def get_response(self, negotiator_id, state, offer):
         self.response_count[negotiator_id] += 1
         t = self.est_frac_complete(negotiator_id)
         my_ufun = self.calculate_ufun(negotiator_id)
-        return self.strategy.respond(my_ufun, offer, t)
+        opp_ufun = OpponentUtilityFunction(1-self.awi.level, self.awi.n_competitors, last_opp_offer=offer)
+        return self.strategy.respond(my_ufun, opp_ufun, offer, t)
 
     def get_offer(self, negotiator_id, state, offer):
         t = self.est_frac_complete(negotiator_id)
@@ -37,6 +45,13 @@ class StrategicAgent(BetterSyncAgent):
         opp_ufun = OpponentUtilityFunction(1-self.awi.level, self.awi.n_competitors, last_opp_offer=offer)
         self.proposal_count[negotiator_id] += 1
         return self.strategy.propose(my_ufun, opp_ufun, t)
+
+    def on_negotiation_success(self, contract, mechanism):
+        o = (contract.agreement['quantity'], self.awi.current_step, contract.agreement['unit_price'])
+        uf = self.calculate_ufun(contract.annotation[self.partner])
+        # print(f"success: {contract} at time {mechanism.state.step}; mu: {uf(o)} ")
+        return super().on_negotiation_success(contract, mechanism)
+        
 
 class AspirationAgent(StrategicAgent):
     def __init__(self) -> None:

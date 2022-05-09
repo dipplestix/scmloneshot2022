@@ -71,7 +71,7 @@ class MeanModel(PredictiveModel):
                 v[1] = p/q
             v[0] = q / count
 
-        print(self.predictions)
+        #print(self.predictions)
 
     def __call__(self, key, min_price, max_price):
         try:
