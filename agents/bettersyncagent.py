@@ -24,6 +24,7 @@ class BetterSyncAgent(OneShotAgent):
 
         self.balances = {c: [] for c in self.partners}
         self.n_negotiation_rounds = self.awi.settings["neg_n_steps"]
+        self.debug = False
 
     def before_step(self):
         # Sets the agent up for the round.
@@ -63,11 +64,13 @@ class BetterSyncAgent(OneShotAgent):
             self.sent_offers[negotiator_id] = offer
         else:
             offer = self.sent_offers[negotiator_id]
+        if self.debug:
+            print(f'I am proposing {offer} to {negotiator_id}')
         return offer
 
     def respond(self, negotiator_id, state, offer):
         self.cleanup(negotiator_id, offer)
-        if self.wait_count[negotiator_id] < (self.max_wait - 1):
+        if self.wait_count[negotiator_id] < (self.max_wait - 1) and len(self.received_offers) < len(self.partners):
             self.wait_count[negotiator_id] += 1
             response = ResponseType.WAIT
         else:
@@ -76,19 +79,32 @@ class BetterSyncAgent(OneShotAgent):
             self.sent_offers[negotiator_id] = self.get_offer(negotiator_id, state, offer)
         else:
             self.sent_offers[negotiator_id] = [0, self.awi.current_step, 0]
+        if self.debug:
+            if response != ResponseType.WAIT:
+                print(f'I have {len(self.received_offers)} offers waiting for me: {self.received_offers}')
+                print(f'I am responding to {negotiator_id}\'s offer of {offer} with {response} after waiting {self.wait_count[negotiator_id]} times')
+                print(f'The time step is {state.step}')
         return response
 
     def on_negotiation_success(self, contract, mechanism):
         negotiator_id = contract.annotation[self.partner]
         q = contract.agreement['quantity']
         p = contract.agreement['unit_price']
-
         offer = [-1]*3
         offer[TIME] = self.awi.current_step
         offer[QUANTITY] = q
         offer[UNIT_PRICE] = p
-
-        self.accepted_offers[negotiator_id] = offer
+        self.q -= q
+        self.accepted_offers[negotiator_id] = tuple(offer)
+        
+    def get_diff(self, offers):
+        accepted = []
+        for nid in self.accepted_offers:
+            accepted.append(self.accepted_offers[nid])
+        dis_util = self.ufun.from_offers(tuple(accepted), tuple(self.output*len(accepted)))
+        accepted.extend(offers)
+        new_util = self.ufun.from_offers(tuple(accepted), tuple(self.output*len(accepted)))
+        return new_util - dis_util
 
     def on_negotiation_failure(self, partners, annotation, mechanism, state):
         pass
@@ -218,12 +234,10 @@ class TestAgent(BetterSyncAgent):
 
 
     def on_negotiation_success(self, contract, mechanism):
-        print("success")
         negotiator_id = contract.annotation[self.partner]
         target = self.target_q[negotiator_id]
         q = contract.agreement['quantity']
         p = contract.agreement['unit_price']
-
         offer = [-1]*3
         offer[TIME] = self.awi.current_step
         offer[QUANTITY] = q
